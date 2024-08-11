@@ -8,6 +8,8 @@
     android:layout_height="match_parent"
     tools:context=".HomePageActivity">
 
+
+
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
@@ -52,6 +54,7 @@
     </androidx.appcompat.widget.Toolbar>
 
     <androidx.recyclerview.widget.RecyclerView
+
         android:id="@+id/bookRec"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -61,69 +64,12 @@
 
     </androidx.recyclerview.widget.RecyclerView>
 
-
-    <!--    <LinearLayout-->
-<!--        android:layout_width="match_parent"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:orientation="horizontal"-->
-<!--        android:padding="20dp">-->
-
-<!--        <ImageView-->
-<!--            android:id="@+id/bookImageId"-->
-<!--            android:layout_width="50dp"-->
-<!--            android:layout_height="50dp"-->
-<!--            android:layout_marginEnd="10dp"-->
-<!--            android:background="@color/blue">-->
-
-<!--        </ImageView>-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="200dp"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:orientation="vertical">-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="Java"-->
-<!--                android:textSize="20dp">-->
-
-<!--            </TextView>-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:text="By Shahrul">-->
-
-<!--            </TextView>-->
-
-<!--        </LinearLayout>-->
-
-<!--        <LinearLayout-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:layout_gravity="center"-->
-<!--            android:orientation="horizontal">-->
-
-<!--            <TextView-->
-<!--                android:layout_width="wrap_content"-->
-<!--                android:layout_height="wrap_content"-->
-<!--                android:layout_gravity="end"-->
-<!--                android:layout_marginEnd="10dp"-->
-<!--                android:gravity="end"-->
-<!--                android:text="11 Dec 15"></TextView>-->
-
-<!--            <ImageButton-->
-<!--                android:layout_width="20dp"-->
-<!--                android:layout_height="20dp"-->
-<!--                android:background="@color/blue">-->
-<!--            </ImageButton>-->
-
-<!--        </LinearLayout>-->
-
-
-<!--    </LinearLayout>-->
-
-
+    <ProgressBar
+        android:id="@+id/progressBar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:layout_gravity="center"
+        android:visibility="visible" />
 
 </LinearLayout>

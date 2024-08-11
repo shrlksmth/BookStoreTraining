@@ -55,6 +55,7 @@ dependencies {
     implementation("com.jpardogo.googleprogressbar:library:1.2.0")
     implementation ("com.github.bumptech.glide:glide:4.16.0")
     annotationProcessor("com.github.bumptech.glide:compiler:4.16.0")
+    implementation ("com.squareup.picasso:picasso:2.8")
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.storage)
     testImplementation(libs.junit)

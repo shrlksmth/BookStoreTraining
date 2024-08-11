@@ -4,6 +4,8 @@ import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
+import android.view.View
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AlertDialog
@@ -25,6 +27,7 @@ class HomePageActivity : AppCompatActivity() {
     private lateinit var dbRef: DatabaseReference
     private lateinit var bookRecyclerView : RecyclerView
     private lateinit var bookArrayList: ArrayList<bookDataClass>
+    private lateinit var progressBar : ProgressBar
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,6 +41,10 @@ class HomePageActivity : AppCompatActivity() {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
+
+        progressBar = binding.progressBar
+
+        progressBar.visibility = View.VISIBLE
 
         bookRecyclerView = findViewById(R.id.bookRec)
         bookRecyclerView.layoutManager = LinearLayoutManager(this)

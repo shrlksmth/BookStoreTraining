@@ -1,5 +1,6 @@
 package com.example.myapplication
 
+import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
@@ -37,6 +38,7 @@ class MainActivity : AppCompatActivity() {
         val database = FirebaseDatabase.getInstance()
 
         loginButton.setOnClickListener {
+
             if (userInputPassword.text.toString().isEmpty() && userInputUserID.text.toString()
                     .isEmpty()
             ) {
@@ -51,8 +53,10 @@ class MainActivity : AppCompatActivity() {
                     if (it.exists()) {
                        val password = it.child("password").value.toString()
                         if (password == userInputPassword.text.toString()){
+
                             ToastUtil.showShortToast(this, "Successfully Login")
                             startActivity(Intent(this, HomePageActivity::class.java))
+
                         }
                         else{
                             ToastUtil.showShortToast(this, "The password is wrong")

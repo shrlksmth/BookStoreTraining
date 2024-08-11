@@ -16,6 +16,12 @@
         app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
         app:titleTextColor="@android:color/white" >
 
+        <Button
+            android:id="@+id/backButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="BACK"></Button>
+
         <TextView
             android:layout_width="wrap_content"
             android:text="Create Book"

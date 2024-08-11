@@ -26,7 +26,6 @@
         android:orientation="vertical"
         android:padding="15dp">
 
-
         <EditText
             android:padding="10dp"
             android:id="@+id/userInputUserID"
@@ -36,7 +35,6 @@
             android:hint="UserId"
             android:background="@drawable/edit_text_border"
             >
-
         </EditText>
 
         <EditText

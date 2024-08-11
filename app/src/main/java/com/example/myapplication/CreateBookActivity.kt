@@ -27,6 +27,7 @@ import com.google.firebase.storage.StorageReference
 import java.io.File
 import java.io.IOException
 import java.text.SimpleDateFormat
+import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
 import java.util.UUID
@@ -55,26 +56,35 @@ class CreateBookActivity : AppCompatActivity() {
 
         val createButton = binding.createButton as Button
         val chooseImageButton = binding.chooseImage as Button
+        val backButton = binding.backButton as Button
+
+        backButton.setOnClickListener{
+            startActivity(Intent(this, HomePageActivity::class.java))
+        }
 
         chooseImageButton.setOnClickListener {
             showImagePickerDialog()
         }
 
         createButton.setOnClickListener {
-            insertDataToFirebase()
+            uploadBookPic()
         }
     }
 
-    private fun insertDataToFirebase() {
+    private fun insertDataToFirebase(dwUrl: String) {
         val userInputBookName = binding.userInputBookName as EditText
         val userInputBookAuthor = binding.userInputBookAuthor as EditText
         val userInputBookNotes = binding.userInputBookNotes as EditText
+
+        val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
+        val currentDate = sdf.format(Date())
 
         val book = bookDataClass(
             bookName = userInputBookName.text.toString(),
             bookAuthor = userInputBookAuthor.text.toString(),
             bookNotes = userInputBookNotes.text.toString(),
-            bookDate = "11/08/2024",
+            bookDate = currentDate,
+            bookUrl = dwUrl
         )
 
         val database = FirebaseDatabase.getInstance().getReference("Users").child("SS")
@@ -82,11 +92,7 @@ class CreateBookActivity : AppCompatActivity() {
 
         database.child("book").child(bookId.toString()).setValue(book).addOnCompleteListener() {
             if (it.isSuccessful) {
-                if (imgUri != null) {
-                    uploadBookPic()
-                } else {
-                    ToastUtil.showShortToast(this, "Please Select image to upload")
-                }
+
             } else {
                 ToastUtil.showShortToast(this, "Failed")
             }
@@ -142,6 +148,7 @@ class CreateBookActivity : AppCompatActivity() {
         if (imgUri != null) {
             val progressDialog = ProgressDialog(this)
             progressDialog.setTitle("Uploading Image..")
+            progressDialog.setCancelable(false)
             progressDialog.setMessage("Processing...")
             progressDialog.show()
 
@@ -149,6 +156,12 @@ class CreateBookActivity : AppCompatActivity() {
                 FirebaseStorage.getInstance().getReference().child(UUID.randomUUID().toString())
 
             ref.putFile(imgUri!!).addOnSuccessListener {
+                ref.downloadUrl.addOnSuccessListener { uri ->
+                    val dwUrl = uri.toString()
+                    insertDataToFirebase(dwUrl)
+                }.addOnFailureListener{
+                    ToastUtil.showShortToast(this,"Cannot get the url of image")
+                }
                 progressDialog.dismiss()
                 ToastUtil.showShortToast(this, "Success")
                 startActivity(Intent(this, HomePageActivity::class.java))
@@ -156,6 +169,8 @@ class CreateBookActivity : AppCompatActivity() {
                 progressDialog.dismiss()
                 ToastUtil.showShortToast(this, "Fail")
             }
+        } else{
+            ToastUtil.showShortToast(this, "Please Select image to upload")
         }
     }
 }
