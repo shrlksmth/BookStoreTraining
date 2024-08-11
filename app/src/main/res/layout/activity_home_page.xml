@@ -1,0 +1,129 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:orientation="vertical"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".HomePageActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:titleTextColor="@android:color/white">
+
+        <Button
+            android:id="@+id/toolbarLogoutButton"
+            android:layout_width="wrap_content"
+            android:text="Logout"
+            android:textSize="16dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:background="@drawable/edit_text_border"
+            android:layout_marginEnd="20dp"
+            android:textColor="@android:color/black" />
+
+        <TextView
+            android:id="@+id/toolbar_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="BookStore"
+            android:textStyle="bold"
+            android:textColor="@android:color/black"
+            android:textSize="20sp"
+            />
+
+        <!-- Add your custom button inside the toolbar -->
+        <ImageButton
+            android:src="@drawable/baseline_add_24"
+            android:id="@+id/toolbarPlusButton"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/edit_text_border"
+            android:layout_gravity="end"
+            android:layout_marginEnd="20dp"
+            android:textColor="@android:color/white" />
+
+
+    </androidx.appcompat.widget.Toolbar>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/bookRec"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginTop="10dp"
+        android:scrollbars="vertical"
+        tools:listitem="@layout/recycler_item">
+
+    </androidx.recyclerview.widget.RecyclerView>
+
+
+    <!--    <LinearLayout-->
+<!--        android:layout_width="match_parent"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:orientation="horizontal"-->
+<!--        android:padding="20dp">-->
+
+<!--        <ImageView-->
+<!--            android:id="@+id/bookImageId"-->
+<!--            android:layout_width="50dp"-->
+<!--            android:layout_height="50dp"-->
+<!--            android:layout_marginEnd="10dp"-->
+<!--            android:background="@color/blue">-->
+
+<!--        </ImageView>-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="200dp"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:orientation="vertical">-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="Java"-->
+<!--                android:textSize="20dp">-->
+
+<!--            </TextView>-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:text="By Shahrul">-->
+
+<!--            </TextView>-->
+
+<!--        </LinearLayout>-->
+
+<!--        <LinearLayout-->
+<!--            android:layout_width="wrap_content"-->
+<!--            android:layout_height="wrap_content"-->
+<!--            android:layout_gravity="center"-->
+<!--            android:orientation="horizontal">-->
+
+<!--            <TextView-->
+<!--                android:layout_width="wrap_content"-->
+<!--                android:layout_height="wrap_content"-->
+<!--                android:layout_gravity="end"-->
+<!--                android:layout_marginEnd="10dp"-->
+<!--                android:gravity="end"-->
+<!--                android:text="11 Dec 15"></TextView>-->
+
+<!--            <ImageButton-->
+<!--                android:layout_width="20dp"-->
+<!--                android:layout_height="20dp"-->
+<!--                android:background="@color/blue">-->
+<!--            </ImageButton>-->
+
+<!--        </LinearLayout>-->
+
+
+<!--    </LinearLayout>-->
+
+
+
+</LinearLayout>

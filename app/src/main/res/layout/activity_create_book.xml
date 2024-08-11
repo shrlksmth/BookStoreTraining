@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".CreateBookActivity">
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:titleTextColor="@android:color/white" >
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:text="Create Book"
+            android:layout_gravity="center"
+            android:textSize="20dp"
+            android:textStyle="bold"
+            android:textColor="@color/black"
+            android:layout_height="wrap_content">
+        </TextView>
+
+        <Button
+            android:id="@+id/createButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:background="@color/blue"
+            android:text="CREATE"></Button>
+    </androidx.appcompat.widget.Toolbar>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="500dp"
+        android:layout_margin="20dp"
+        android:background="@drawable/create_main_container"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <ImageView
+            android:src="@drawable/baseline_image_search_24"
+            android:padding="10dp"
+            android:id="@+id/bookImageView"
+            android:layout_width="200dp"
+            android:layout_marginBottom="5dp"
+            android:layout_height="200dp"
+            >
+            </ImageView>
+
+        <Button
+            android:id="@+id/chooseImage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="20dp"
+            android:text="choose image"></Button>
+
+        <EditText
+            android:id="@+id/userInputBookName"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:layout_marginBottom="10dp"
+            android:background="@drawable/edit_text_border"
+            android:hint="Name"></EditText>
+
+        <EditText
+            android:id="@+id/userInputBookAuthor"
+            android:layout_width="match_parent"
+            android:layout_height="50dp"
+            android:background="@drawable/edit_text_border"
+            android:hint="Author"></EditText>
+
+
+        <EditText
+            android:id="@+id/userInputBookNotes"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:height="200dp"
+            android:background="@drawable/edit_text_border"
+            android:hint="Notes"></EditText>
+
+    </LinearLayout>
+
+<!--    <Button-->
+<!--        android:id="@+id/createButton"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:layout_gravity="center"-->
+<!--        android:text="CREATE"></Button>-->
+
+</LinearLayout>
