@@ -3,6 +3,7 @@ package com.example.myapplication
 import android.app.ProgressDialog
 import android.content.Intent
 import android.os.Bundle
+import android.os.Handler
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -12,8 +13,13 @@ import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.myapplication.databinding.ActivityMainBinding
 import com.example.yourapp.utils.ToastUtil
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import com.google.firebase.database.values
+
 
 
 class MainActivity : AppCompatActivity() {
@@ -32,43 +38,34 @@ class MainActivity : AppCompatActivity() {
             insets
         }
 
-        val loginButton = binding.loginButtonID as Button
-        val userInputUserID = binding.userInputUserID as EditText
-        val userInputPassword = binding.userInputPasswordID as EditText
-        val database = FirebaseDatabase.getInstance()
+        Handler().postDelayed({
+            checkLoginState()
 
-        loginButton.setOnClickListener {
+        }, 2000)
 
-            if (userInputPassword.text.toString().isEmpty() && userInputUserID.text.toString()
-                    .isEmpty()
-            ) {
-                ToastUtil.showShortToast(this, "Please enter the userID and Password")
-            } else if (userInputUserID.text.toString().isEmpty()) {
-                ToastUtil.showShortToast(this, "Please enter the userID")
-            } else if (userInputPassword.text.toString().isEmpty()) {
-                ToastUtil.showShortToast(this, "Please enter the password")
-            } else {
-                val myRef = database.getReference("Users")
-                myRef.child(userInputUserID.text.toString()).get().addOnSuccessListener {
-                    if (it.exists()) {
-                       val password = it.child("password").value.toString()
-                        if (password == userInputPassword.text.toString()){
 
-                            ToastUtil.showShortToast(this, "Successfully Login")
-                            startActivity(Intent(this, HomePageActivity::class.java))
 
-                        }
-                        else{
-                            ToastUtil.showShortToast(this, "The password is wrong")
-                        }
-                    } else {
-                        ToastUtil.showShortToast(this, "The UserID doesn't exist")
-                    }
-                }.addOnFailureListener {
-                    ToastUtil.showShortToast(this, "Something Went Wrong")
+    }
+
+    private fun checkLoginState() {
+
+        val dbRef =
+            FirebaseDatabase.getInstance().getReference("Users").child("SS").child("isLogin")
+
+        dbRef.get().addOnSuccessListener { data: DataSnapshot ->
+            if (data.exists()) {
+                val isLogin: Boolean = data.value as Boolean
+
+                if (isLogin == true) {
+                    startActivity(Intent(this, HomePageActivity::class.java))
+                } else {
+                    startActivity(Intent(this, LoginActivity::class.java))
                 }
             }
+        }.addOnFailureListener {
+            println("failed")
         }
+
     }
 
     data class Book(

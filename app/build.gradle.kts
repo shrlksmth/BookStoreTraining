@@ -58,7 +58,10 @@ dependencies {
     implementation ("com.squareup.picasso:picasso:2.8")
     implementation(libs.firebase.storage.ktx)
     implementation(libs.firebase.storage)
+    implementation("com.karumi:dexter:6.2.2")
+    implementation("io.coil-kt:coil:1.1.1")
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
 }
