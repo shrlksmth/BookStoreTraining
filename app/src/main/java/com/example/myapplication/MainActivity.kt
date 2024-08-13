@@ -21,7 +21,6 @@ import com.google.firebase.database.ValueEventListener
 import com.google.firebase.database.values
 
 
-
 class MainActivity : AppCompatActivity() {
 
     lateinit var binding: ActivityMainBinding
@@ -42,8 +41,6 @@ class MainActivity : AppCompatActivity() {
             checkLoginState()
 
         }, 2000)
-
-
 
     }
 

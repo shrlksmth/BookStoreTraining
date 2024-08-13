@@ -5,7 +5,6 @@ import android.app.ProgressDialog
 import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
-import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -15,13 +14,11 @@ import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageView
 import androidx.activity.enableEdgeToEdge
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
-import androidx.core.content.FileProvider
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.myapplication.databinding.ActivityCreateBookBinding
+import com.example.myapplication.utility.Pd
 import com.example.yourapp.utils.ToastUtil
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -35,16 +32,20 @@ import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
 import java.text.SimpleDateFormat
-import java.time.LocalDate
 import java.util.Date
 import java.util.Locale
-import java.util.UUID
 
 class CreateBookActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityCreateBookBinding
     private var imgUri: Uri? = null
     private val CAMERA_REQUEST_CODE = 1
+    private lateinit var userInputBookName: EditText
+    private lateinit var userInputBookAuthor: EditText
+    private lateinit var userInputBookNotes: EditText
+    private lateinit var createButton: Button
+    private lateinit var chooseImageButton: Button
+    private lateinit var backButton: Button
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -59,9 +60,12 @@ class CreateBookActivity : AppCompatActivity() {
             insets
         }
 
-        val createButton = binding.createButton as Button
-        val chooseImageButton = binding.chooseImage as Button
-        val backButton = binding.backButton as Button
+        createButton = binding.createButton
+        chooseImageButton = binding.chooseImage
+        backButton = binding.backButton
+        userInputBookName = binding.userInputBookName
+        userInputBookAuthor = binding.userInputBookAuthor
+        userInputBookNotes = binding.userInputBookNotes
 
         backButton.setOnClickListener {
             startActivity(Intent(this, HomePageActivity::class.java))
@@ -69,39 +73,48 @@ class CreateBookActivity : AppCompatActivity() {
 
         chooseImageButton.setOnClickListener {
             showImagePickerDialog()
+
         }
 
         createButton.setOnClickListener {
-            uploadBookPic()
+
+            if (checkTextNull()) {
+                uploadBookPic()
+            }
+
         }
     }
 
-    private fun insertDataToFirebase(dwUrl: String) {
-        val userInputBookName = binding.userInputBookName as EditText
-        val userInputBookAuthor = binding.userInputBookAuthor as EditText
-        val userInputBookNotes = binding.userInputBookNotes as EditText
+    private fun insertDataToFirebase(bookImageUrl: String, progressDialog: ProgressDialog, imageName : String) {
 
         val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         val currentDate = sdf.format(Date())
 
-
         val database = FirebaseDatabase.getInstance().getReference("Users").child("SS")
         val bookId = database.push().key
+
+        val currentMillis = System.currentTimeMillis()
 
         val book = bookDataClass(
             bookName = userInputBookName.text.toString(),
             bookAuthor = userInputBookAuthor.text.toString(),
             bookNotes = userInputBookNotes.text.toString(),
             bookDate = currentDate,
-            bookUrl = dwUrl,
-            bookID = bookId
+            bookUrl = bookImageUrl,
+            bookID = bookId,
+            timeStamp = currentMillis,
+            imgUri = imgUri.toString(),
+            imgName = imageName
         )
 
         database.child("book").child(bookId.toString()).setValue(book).addOnCompleteListener() {
             if (it.isSuccessful) {
-
+                Pd.dismissProgressDialog(progressDialog)
+                ToastUtil.showShortToast(this, "Successfully upload your data")
+                startActivity(Intent(this, HomePageActivity::class.java))
             } else {
-                ToastUtil.showShortToast(this, "Failed")
+                Pd.dismissProgressDialog(progressDialog)
+                ToastUtil.showShortToast(this, "Something went wrong")
             }
         }
     }
@@ -112,7 +125,7 @@ class CreateBookActivity : AppCompatActivity() {
         builder.setTitle("Select Action")
         builder.setItems(options) { dialog, which ->
             when (which) {
-                0 -> openCamera()
+                0 -> useCamera()
                 1 -> chooseImage()
                 2 -> dialog.dismiss()
             }
@@ -129,8 +142,7 @@ class CreateBookActivity : AppCompatActivity() {
         )
     }
 
-    private fun openCamera() {
-        ToastUtil.showShortToast(this, "Still under development")
+    private fun useCamera() {
         cameraCheckPermission()
     }
 
@@ -144,7 +156,7 @@ class CreateBookActivity : AppCompatActivity() {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                     report?.let {
                         if (report.areAllPermissionsGranted()) {
-                            camera()
+                            openCamera()
                         }
                     }
                 }
@@ -178,7 +190,7 @@ class CreateBookActivity : AppCompatActivity() {
             }.show()
     }
 
-    private fun camera() {
+    private fun openCamera() {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         startActivityForResult(intent, CAMERA_REQUEST_CODE)
     }
@@ -216,31 +228,45 @@ class CreateBookActivity : AppCompatActivity() {
 
     private fun uploadBookPic() {
         if (imgUri != null) {
+
             val progressDialog = ProgressDialog(this)
-            progressDialog.setTitle("Uploading Image..")
-            progressDialog.setCancelable(false)
-            progressDialog.setMessage("Processing...")
-            progressDialog.show()
+
+
+            Pd.showProgressDialog("Uploading Data", "Processing...", progressDialog)
+
+            val imageName = System.currentTimeMillis()
 
             val ref: StorageReference =
-                FirebaseStorage.getInstance().getReference().child(UUID.randomUUID().toString())
+                FirebaseStorage.getInstance().getReference().child(imageName.toString())
 
             ref.putFile(imgUri!!).addOnSuccessListener {
                 ref.downloadUrl.addOnSuccessListener { uri ->
-                    val dwUrl = uri.toString()
-                    insertDataToFirebase(dwUrl)
+                    val bookImageUrl = uri.toString()
+                    insertDataToFirebase(bookImageUrl, progressDialog, imageName.toString())
+
                 }.addOnFailureListener {
+                    Pd.dismissProgressDialog(progressDialog)
                     ToastUtil.showShortToast(this, "Cannot get the url of image")
                 }
-                progressDialog.dismiss()
-                ToastUtil.showShortToast(this, "Success")
-                startActivity(Intent(this, HomePageActivity::class.java))
+
             }.addOnFailureListener {
-                progressDialog.dismiss()
+                Pd.dismissProgressDialog(progressDialog)
                 ToastUtil.showShortToast(this, "Fail")
             }
         } else {
             ToastUtil.showShortToast(this, "Please Select image to upload")
+        }
+    }
+
+    private fun checkTextNull() : Boolean {
+        if(userInputBookName.text.isEmpty()){
+            ToastUtil.showShortToast(this, "Please insert the book name")
+            return false
+        } else if(userInputBookAuthor.text.isEmpty()){
+            ToastUtil.showShortToast(this, "Please insert the book author")
+            return false
+        } else {
+            return true
         }
     }
 }

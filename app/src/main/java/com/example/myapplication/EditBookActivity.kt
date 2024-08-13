@@ -19,9 +19,12 @@ import android.widget.ProgressBar
 import android.widget.TextView
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.net.toUri
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import com.example.myapplication.utility.Pd
 import com.example.yourapp.utils.ToastUtil
+import com.google.firebase.Timestamp
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.storage.FirebaseStorage
@@ -51,6 +54,7 @@ class EditBookActivity : AppCompatActivity() {
     private lateinit var bookNotesText: TextView
     private lateinit var bookImgUrl: String
     private lateinit var bookId: String
+    private lateinit var imageName: String
 
     private var imgUri: Uri? = null
     private val CAMERA_REQUEST_CODE = 1
@@ -70,18 +74,25 @@ class EditBookActivity : AppCompatActivity() {
         val bookNotes = intent.getStringExtra("notes")
         bookId = intent.getStringExtra("id")!!
         val bookImg = intent.getStringExtra("imgUrl")
+        imgUri = intent.getStringExtra("imgUri")!!.toUri()
+        imageName = intent.getStringExtra("imgName").toString()
 
         val editButton: Button = findViewById(R.id.editButton)
         bookNameText = findViewById(R.id.userInputBookName)
         bookAuthorText = findViewById(R.id.userInputBookAuthor)
         bookNotesText = findViewById(R.id.userInputBookNotes)
         bookImageView = findViewById(R.id.bookImageView)
+        val backButton: Button = findViewById(R.id.backButtonEditPage)
         val chooseImageButton: Button = findViewById(R.id.chooseImageButtonEdit)
         progressBar = findViewById(R.id.progress_edit)
 
-        Picasso.get()
-            .load(bookImg)
-            .placeholder(R.drawable.baseline_image_search_24)
+
+        backButton.setOnClickListener {
+            startActivity(Intent(this, HomePageActivity::class.java))
+        }
+
+
+        Picasso.get().load(bookImg).placeholder(R.drawable.baseline_image_search_24)
             .into(bookImageView)
 
         bookNameText.text = bookName
@@ -93,8 +104,6 @@ class EditBookActivity : AppCompatActivity() {
         editButton.setOnClickListener {
 
             if (isButtonPressed) {
-
-                println(imgUri)
 
                 uploadBookPic()
 
@@ -116,8 +125,12 @@ class EditBookActivity : AppCompatActivity() {
 
     fun updateValue(progressDialog: ProgressDialog) {
 
+        println("entering firebase")
+
         val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         val currentDate = sdf.format(Date())
+
+        val currentMillis = System.currentTimeMillis()
 
         val editBookObject = bookDataClass(
             bookName = bookNameText.text.toString(),
@@ -125,11 +138,12 @@ class EditBookActivity : AppCompatActivity() {
             bookAuthor = bookAuthorText.text.toString(),
             bookDate = currentDate.toString(),
             bookUrl = bookImgUrl,
-            bookID = bookId
+            bookID = bookId,
+            timeStamp = currentMillis,
+            imgUri = imgUri.toString(),
+            imgName = imageName
         )
 
-        progressDialog.setTitle("Uploading Data..")
-        progressDialog.setCancelable(false)
 
         // Get a reference to the database
         val dbRef: DatabaseReference =
@@ -138,20 +152,19 @@ class EditBookActivity : AppCompatActivity() {
 
         // Update a specific field
         val updatedData = mapOf(bookId to editBookObject)
-        dbRef.updateChildren(updatedData)
-            .addOnSuccessListener {
-                progressBar.visibility = View.GONE
-                progressDialog.dismiss()
-                // Handle successful update
-                ToastUtil.showShortToast(this, "Successfully edit your book")
+        dbRef.updateChildren(updatedData).addOnSuccessListener {
+            progressBar.visibility = View.GONE
+            Pd.dismissProgressDialog(progressDialog)
+            // Handle successful update
+            ToastUtil.showShortToast(this, "Successfully edit your book")
 
-                startActivity(Intent(this, HomePageActivity::class.java))
-            }
-            .addOnFailureListener { e ->
-                // Handle possible errors
-                ToastUtil.showShortToast(this, "Error updating value: ${e.message}")
+            startActivity(Intent(this, HomePageActivity::class.java))
+        }.addOnFailureListener { e ->
+            Pd.dismissProgressDialog(progressDialog)
+            // Handle possible errors
+            ToastUtil.showShortToast(this, "Error updating value: ${e.message}")
 
-            }
+        }
     }
 
 
@@ -173,13 +186,9 @@ class EditBookActivity : AppCompatActivity() {
         if (imgUri != null) {
 
             val progressDialog = ProgressDialog(this)
-            progressDialog.setTitle("Uploading Image..")
-            progressDialog.setCancelable(false)
-            progressDialog.setMessage("Processing...")
-            progressDialog.show()
+            Pd.showProgressDialog("Processing...", "Updating Data", progressDialog)
 
-            val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
-            val imageName = "img_${sdf.format(Date())}"
+            imageName = System.currentTimeMillis().toString()
 
             val ref: StorageReference =
                 FirebaseStorage.getInstance().getReference().child(imageName)
@@ -187,6 +196,8 @@ class EditBookActivity : AppCompatActivity() {
             ref.putFile(imgUri!!).addOnSuccessListener {
                 ref.downloadUrl.addOnSuccessListener { uri ->
                     bookImgUrl = uri.toString()
+
+                    println("success put image")
 
                     updateValue(progressDialog)
 
@@ -214,34 +225,29 @@ class EditBookActivity : AppCompatActivity() {
     }
 
     private fun openCamera() {
-        ToastUtil.showShortToast(this, "Still under development")
         cameraCheckPermission()
     }
 
     private fun cameraCheckPermission() {
 
         Dexter.withContext(this).withPermissions(
-            android.Manifest.permission.READ_EXTERNAL_STORAGE,
-            android.Manifest.permission.CAMERA
-        ).withListener(
-            object : MultiplePermissionsListener {
-                override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
-                    report?.let {
-                        if (report.areAllPermissionsGranted()) {
-                            camera()
-                        }
+            android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.CAMERA
+        ).withListener(object : MultiplePermissionsListener {
+            override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
+                report?.let {
+                    if (report.areAllPermissionsGranted()) {
+                        camera()
                     }
                 }
-
-                override fun onPermissionRationaleShouldBeShown(
-                    p0: MutableList<PermissionRequest>?,
-                    p1: PermissionToken?
-                ) {
-                    showRorationalDialogForPermission()
-                }
-
             }
-        ).onSameThread().check()
+
+            override fun onPermissionRationaleShouldBeShown(
+                p0: MutableList<PermissionRequest>?, p1: PermissionToken?
+            ) {
+                showRorationalDialogForPermission()
+            }
+
+        }).onSameThread().check()
 
     }
 
@@ -256,8 +262,7 @@ class EditBookActivity : AppCompatActivity() {
                 } catch (e: ActivityNotFoundException) {
                     e.printStackTrace()
                 }
-            }
-            .setNegativeButton("CANCEL") { dialog, _ ->
+            }.setNegativeButton("CANCEL") { dialog, _ ->
                 dialog.dismiss()
             }.show()
     }

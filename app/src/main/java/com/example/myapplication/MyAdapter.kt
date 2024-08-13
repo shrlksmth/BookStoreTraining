@@ -14,11 +14,11 @@ import com.example.yourapp.utils.ToastUtil
 import com.google.firebase.Firebase
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
 
 class MyAdapter(private val bookList: ArrayList<bookDataClass>, private val context: Context) : RecyclerView.Adapter<MyAdapter.MyViewHolder>() {
-
-    var onItemClick: ((bookDataClass) -> Unit)? = null
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val itemView = LayoutInflater.from(parent.context).inflate(R.layout.recycler_item, parent, false)
@@ -33,8 +33,8 @@ class MyAdapter(private val bookList: ArrayList<bookDataClass>, private val cont
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val currentItem = bookList[position]
 
-        holder.bookName.text = currentItem.bookName
-        holder.bookAuthor.text = currentItem.bookAuthor
+        holder.bookName.text = currentItem.bookName!!.uppercase()
+        holder.bookAuthor.text = currentItem.bookAuthor!!.uppercase()
         holder.bookDate.text = currentItem.bookDate
 
         Picasso.get()
@@ -43,7 +43,7 @@ class MyAdapter(private val bookList: ArrayList<bookDataClass>, private val cont
             .into(holder.bookPic)
     }
 
-    fun removeItem(position: Int, dbRef: DatabaseReference) {
+    fun removeItem(position: Int) {
         val itemId : String? = bookList[position].bookID
         println("item id $position : $itemId")
 
@@ -52,7 +52,26 @@ class MyAdapter(private val bookList: ArrayList<bookDataClass>, private val cont
 
         println("item id : $itemId")
         // Delete from Firebase
-        FirebaseDatabase.getInstance().getReference("Users").child("SS").child("book").child(itemId.toString()).removeValue()
+        FirebaseDatabase.getInstance().getReference("Users").child("SS").child("book").child(itemId.toString()).removeValue().addOnSuccessListener {
+            //deleteImage(bookList[position].imgUri!!)
+        }
+    }
+
+    private fun deleteImage(imageName: String) {
+
+        println(imageName)
+        // Reference to the image file in Firebase Storage
+        val ref: StorageReference =
+            FirebaseStorage.getInstance().getReferenceFromUrl(imageName)
+            // Delete the file
+        ref.delete().addOnSuccessListener {
+            // File deleted successfully
+            println("success")
+        }.addOnFailureListener {
+            // Error occurred during delete
+            println("fail")
+
+        }
     }
 
     inner class MyViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView){
@@ -73,6 +92,8 @@ class MyAdapter(private val bookList: ArrayList<bookDataClass>, private val cont
                     intent.putExtra("image", bookList[position].bookUrl)
                     intent.putExtra("id", bookList[position].bookID)
                     intent.putExtra("imgUrl", bookList[position].bookUrl)
+                    intent.putExtra("imgUri", bookList[position].imgUri)
+                    intent.putExtra("imgName", bookList[position].imgName)
 
                     context.startActivity(intent)
                 }

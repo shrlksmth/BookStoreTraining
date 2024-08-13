@@ -5,20 +5,16 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.EditText
-import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import com.example.myapplication.databinding.ActivityLoginBinding
-import com.example.myapplication.databinding.ActivityMainBinding
+import com.example.myapplication.utility.Pd
 import com.example.yourapp.utils.ToastUtil
 import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.ValueEventListener
-import com.google.firebase.database.values
 
 
 class LoginActivity : AppCompatActivity() {
@@ -46,6 +42,7 @@ class LoginActivity : AppCompatActivity() {
 
         loginButton.setOnClickListener {
 
+
             if (userInputPassword.text.toString().isEmpty() && userInputUserID.text.toString()
                     .isEmpty()
             ) {
@@ -55,43 +52,44 @@ class LoginActivity : AppCompatActivity() {
             } else if (userInputPassword.text.toString().isEmpty()) {
                 ToastUtil.showShortToast(this, "Please enter the password")
             } else {
+                val progressDialog = ProgressDialog(this)
+                Pd.showProgressDialog("Processing...", "Login in", progressDialog)
+
                 val myRef = database.getReference("Users")
                 myRef.child(userInputUserID.text.toString()).get().addOnSuccessListener {
                     if (it.exists()) {
                         val password = it.child("password").value.toString()
                         if (password == userInputPassword.text.toString()) {
-                            updateValue()
-
+                            updateLoginState(progressDialog)
                         } else {
+                            Pd.dismissProgressDialog(progressDialog)
                             ToastUtil.showShortToast(this, "The password is wrong")
                         }
                     } else {
+                        Pd.dismissProgressDialog(progressDialog)
                         ToastUtil.showShortToast(this, "The UserID doesn't exist")
                     }
                 }.addOnFailureListener {
+                    Pd.dismissProgressDialog(progressDialog)
                     ToastUtil.showShortToast(this, "Something Went Wrong")
                 }
             }
         }
     }
 
-    fun updateValue() {
-        // Get a reference to the database
+    fun updateLoginState(progressDialog: ProgressDialog) {
+
         val dbRef: DatabaseReference =
             FirebaseDatabase.getInstance().getReference("Users").child("SS")
 
-        // Define the path to the node you want to update
-
-        // Update a specific field
         val updatedData = mapOf("isLogin" to true)
         dbRef.updateChildren(updatedData)
             .addOnSuccessListener {
-                // Handle successful update
+                Pd.dismissProgressDialog(progressDialog)
                 startActivity(Intent(this, HomePageActivity::class.java))
                 ToastUtil.showShortToast(this, "Successfully Login")
             }
             .addOnFailureListener { e ->
-                // Handle possible errors
                 println("Error updating value: ${e.message}")
             }
     }
