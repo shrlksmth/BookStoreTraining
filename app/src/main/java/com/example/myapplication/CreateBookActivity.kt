@@ -46,9 +46,6 @@ class CreateBookActivity : AppCompatActivity() {
     private var imgUri: Uri? = null
     private val CAMERA_REQUEST_CODE = 1
 
-    companion object {
-        private const val CAMERA = 2
-    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -66,7 +63,7 @@ class CreateBookActivity : AppCompatActivity() {
         val chooseImageButton = binding.chooseImage as Button
         val backButton = binding.backButton as Button
 
-        backButton.setOnClickListener{
+        backButton.setOnClickListener {
             startActivity(Intent(this, HomePageActivity::class.java))
         }
 
@@ -86,7 +83,6 @@ class CreateBookActivity : AppCompatActivity() {
 
         val sdf = SimpleDateFormat("dd-MM-yyyy", Locale.getDefault())
         val currentDate = sdf.format(Date())
-
 
 
         val database = FirebaseDatabase.getInstance().getReference("Users").child("SS")
@@ -135,34 +131,29 @@ class CreateBookActivity : AppCompatActivity() {
 
     private fun openCamera() {
         ToastUtil.showShortToast(this, "Still under development")
-
-
         cameraCheckPermission()
-//        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-//        startActivityForResult(intent, CAMERA)
     }
 
     private fun cameraCheckPermission() {
 
-        Dexter.withContext(this).withPermissions(android.Manifest.permission.READ_EXTERNAL_STORAGE, android.Manifest.permission.CAMERA).withListener(
-            object : MultiplePermissionsListener{
+        Dexter.withContext(this).withPermissions(
+            android.Manifest.permission.READ_EXTERNAL_STORAGE,
+            android.Manifest.permission.CAMERA
+        ).withListener(
+            object : MultiplePermissionsListener {
                 override fun onPermissionsChecked(report: MultiplePermissionsReport?) {
                     report?.let {
-                        if(report.areAllPermissionsGranted()){
+                        if (report.areAllPermissionsGranted()) {
                             camera()
                         }
                     }
-
-
                 }
 
                 override fun onPermissionRationaleShouldBeShown(
                     p0: MutableList<PermissionRequest>?,
                     p1: PermissionToken?
                 ) {
-
                     showRorationalDialogForPermission()
-
                 }
 
             }
@@ -171,31 +162,25 @@ class CreateBookActivity : AppCompatActivity() {
     }
 
     private fun showRorationalDialogForPermission() {
-        AlertDialog.Builder(this).setMessage("It looks it u have turned off permissions").setPositiveButton("Go to settings"){
-            _,_ ->
-            try {
-
-                val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                val uri = Uri.fromParts("package", packageName, null)
-                intent.data = uri
-                startActivity(intent)
-
-            }catch (e: ActivityNotFoundException){
-                e.printStackTrace()
+        AlertDialog.Builder(this).setMessage("It looks it u have turned off permissions")
+            .setPositiveButton("Go to settings") { _, _ ->
+                try {
+                    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                    val uri = Uri.fromParts("package", packageName, null)
+                    intent.data = uri
+                    startActivity(intent)
+                } catch (e: ActivityNotFoundException) {
+                    e.printStackTrace()
+                }
             }
-        }
-
-            .setNegativeButton("CANCEL"){
-                dialog, _->
+            .setNegativeButton("CANCEL") { dialog, _ ->
                 dialog.dismiss()
             }.show()
     }
 
     private fun camera() {
-
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
         startActivityForResult(intent, CAMERA_REQUEST_CODE)
-
     }
 
 
@@ -204,7 +189,7 @@ class CreateBookActivity : AppCompatActivity() {
         if (resultCode == RESULT_OK && data != null) {
             val imageView: ImageView = binding.bookImageView
             if (requestCode == CAMERA_REQUEST_CODE) {
-                val thumbNail : Bitmap = data!!.extras!!.get("data") as Bitmap
+                val thumbNail: Bitmap = data!!.extras!!.get("data") as Bitmap
                 imageView.setImageBitmap(thumbNail)
                 imgUri = saveBitmapToFile(this, thumbNail)
             } else if (requestCode == 200) {
@@ -244,8 +229,8 @@ class CreateBookActivity : AppCompatActivity() {
                 ref.downloadUrl.addOnSuccessListener { uri ->
                     val dwUrl = uri.toString()
                     insertDataToFirebase(dwUrl)
-                }.addOnFailureListener{
-                    ToastUtil.showShortToast(this,"Cannot get the url of image")
+                }.addOnFailureListener {
+                    ToastUtil.showShortToast(this, "Cannot get the url of image")
                 }
                 progressDialog.dismiss()
                 ToastUtil.showShortToast(this, "Success")
@@ -254,7 +239,7 @@ class CreateBookActivity : AppCompatActivity() {
                 progressDialog.dismiss()
                 ToastUtil.showShortToast(this, "Fail")
             }
-        } else{
+        } else {
             ToastUtil.showShortToast(this, "Please Select image to upload")
         }
     }

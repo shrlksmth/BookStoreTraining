@@ -63,7 +63,8 @@
                 android:src="@drawable/baseline_image_search_24"></ImageView>
 
             <Button
-                android:id="@+id/chooseImage"
+                android:id="@+id/chooseImageButtonEdit"
+                android:visibility="invisible"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="20dp"

@@ -152,18 +152,18 @@ class HomePageActivity : AppCompatActivity() {
                 if(snapshot.exists()){
                     linearLayout.visibility = View.VISIBLE
                     progressBar.visibility = View.GONE
-                    var num : Int = 1;
-
                     bookArrayList.clear()
 
                     for (bookSnapshot in snapshot.children){
                         val book = bookSnapshot.getValue(bookDataClass::class.java)
                         bookArrayList.add(book!!)
-                        println(num++)
                     }
                     bookRecyclerView.adapter = MyAdapter(bookArrayList, context)
+                }
 
-                //    MyAdapter(bookArrayList).notifyDataSetChanged()
+                else{
+                    linearLayout.visibility = View.VISIBLE
+                    progressBar.visibility = View.GONE
                 }
             }
 
