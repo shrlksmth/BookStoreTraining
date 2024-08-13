@@ -123,6 +123,16 @@ class EditBookActivity : AppCompatActivity() {
 
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed()
+        // Navigate to SpecificActivity when back button is pressed
+        val intent = Intent(this, HomePageActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP // Optional: Clear the activity stack
+        startActivity(intent)
+        // Optional: Finish the current activity if you want to remove it from the stack
+        finish()
+    }
+
     fun updateValue(progressDialog: ProgressDialog) {
 
         println("entering firebase")

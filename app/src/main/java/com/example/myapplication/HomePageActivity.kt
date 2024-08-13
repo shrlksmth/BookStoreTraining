@@ -45,6 +45,8 @@ class HomePageActivity : AppCompatActivity() {
             insets
         }
 
+
+
         progressBar = findViewById(R.id.progress_circular)
         linearLayout = findViewById(R.id.linearLayHome)
 
@@ -60,8 +62,26 @@ class HomePageActivity : AppCompatActivity() {
 
         binding.toolbarLogoutButton.setOnClickListener {
 
-            UpdateLoginStateInFirebase()
+            println(bookArrayList[0].bookName)
+
+
+            val builder = AlertDialog.Builder(this)
+            builder.setTitle("Log Out")
+            builder.setMessage("Are you sure want to log out?")
+
+            builder.setPositiveButton("OK") { dialog, _ ->
+                UpdateLoginStateInFirebase()
+            }
+
+            builder.setNegativeButton("Cancel") { dialog, _ ->
+                dialog.dismiss()
+            }
+
+            val dialog = builder.create()
+            dialog.show()
         }
+
+
 
         binding.toolbarPlusButton.setOnClickListener {
             startActivity(Intent(this, CreateBookActivity::class.java))
@@ -71,6 +91,26 @@ class HomePageActivity : AppCompatActivity() {
         itemTouchHelper.attachToRecyclerView(bookRecyclerView)
     }
 
+    override fun onBackPressed() {
+        // Create an AlertDialog to ask for exit confirmation
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Exit App")
+        builder.setMessage("Are you sure you want to exit the app?")
+
+        // Positive button to confirm exit
+        builder.setPositiveButton("Yes") { dialog, _ ->
+            super.onBackPressed() // Call the default implementation to finish the activity
+            finishAffinity() // Close all activities and exit the app
+        }
+
+        // Negative button to cancel exit
+        builder.setNegativeButton("No") { dialog, _ ->
+            dialog.dismiss() // Dismiss the dialog and continue the current activity
+        }
+
+        val dialog = builder.create()
+        dialog.show()
+    }
 
     fun UpdateLoginStateInFirebase() {
 
@@ -116,11 +156,11 @@ class HomePageActivity : AppCompatActivity() {
             .setTitle("Confirm Deletion")
             .setMessage("Are you sure you want to delete this item?")
             .setPositiveButton("Yes") { _, _ ->
-                adapter.removeItem(position)
+                adapter.removeBook(position)
             }
             .setNegativeButton("No") { dialog, _ ->
                 // If canceled, notify adapter to restore item
-                adapter.notifyItemChanged(position)
+                bookRecyclerView.adapter = MyAdapter(bookArrayList, this)
                 dialog.dismiss()
             }
             .create()

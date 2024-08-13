@@ -77,6 +77,11 @@ class LoginActivity : AppCompatActivity() {
         }
     }
 
+    override fun onBackPressed() {
+        super.onBackPressed() // Call the default implementation to finish the activity
+        finishAffinity() // Close all activities and exit the app
+    }
+
     fun updateLoginState(progressDialog: ProgressDialog) {
 
         val dbRef: DatabaseReference =
