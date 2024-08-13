@@ -62,9 +62,6 @@ class HomePageActivity : AppCompatActivity() {
 
         binding.toolbarLogoutButton.setOnClickListener {
 
-            println(bookArrayList[0].bookName)
-
-
             val builder = AlertDialog.Builder(this)
             builder.setTitle("Log Out")
             builder.setMessage("Are you sure want to log out?")
@@ -80,7 +77,6 @@ class HomePageActivity : AppCompatActivity() {
             val dialog = builder.create()
             dialog.show()
         }
-
 
 
         binding.toolbarPlusButton.setOnClickListener {
